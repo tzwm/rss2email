@@ -14,7 +14,7 @@ SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
  
 SENDER = "tzwm.rss@gmail.com" 
-PASSWORD = "" 
+PASSWORD = "wang1jun2zhe3_rss" 
 RECIPIENT = 'tzwm.rss@gmail.com'
 
 def getMD5(s):
@@ -62,7 +62,7 @@ class FeedItem():
         msg = MIMEMultipart()
         msg['From'] = SENDER
         msg['To'] = RECIPIENT
-        message = item.description + '\n' + item.link
+        message = item.description + '<\ br>' + item.link
         msg['Subject'] = item.title
         msg.attach(MIMEText(message.encode('utf8'), 'html'))
         #print(msg.as_string())
@@ -104,7 +104,7 @@ def main():
 
     lines = []
     o_file = open("rsslist.txt", "r")
-    for line in o_line:
+    for line in o_file:
         lines.append(line.strip('\n'))
     o_file.close()
 
