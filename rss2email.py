@@ -14,7 +14,7 @@ SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
  
 SENDER = "tzwm.rss@gmail.com" 
-PASSWORD = "wang1jun2zhe3_rss" 
+PASSWORD = "" 
 RECIPIENT = 'tzwm.rss@gmail.com'
 
 def getMD5(s):
@@ -36,6 +36,7 @@ class FeedItem():
         self.session = _session
         self.infoLine = inputLine
 
+        inputLine = inputLine.strip('\n')
         inputLine = inputLine.split(' ', 2)
         self.feedLink = inputLine[0]
         if len(inputLine) == 1:
@@ -47,6 +48,8 @@ class FeedItem():
             self.lastMD5 = inputLine[1]
             self.lastModified = inputLine[2]
             self.feedD = feedparser.parse(self.feedLink, modified=self.lastModified)
+
+        print self.feedD.feed.title + ":",
 
     def checkUpdate(self):
         if self.feedD.status == 304:
@@ -65,7 +68,7 @@ class FeedItem():
         msg = MIMEMultipart()
         msg['From'] = SENDER
         msg['To'] = RECIPIENT
-        message = item.description + '<\ br>' + item.link
+        message = item.description + '<br /><br />' + item.link
         msg['Subject'] = item.title
         msg.attach(MIMEText(message.encode('utf8'), 'html'))
         #print(msg.as_string())
@@ -82,6 +85,7 @@ class FeedItem():
         if not self.checkUpdate():
             return False
 
+        number = 0
         ret = 0;
         if self.lastMD5 == "":
             ret = 1
@@ -91,7 +95,8 @@ class FeedItem():
                 if self.checkItem(feed):
                     ret = 1
                 continue
-   
+            
+            number = number + 1
             self.sendItem(feed)
 
         if ret == 0:
@@ -102,8 +107,12 @@ class FeedItem():
         self.lastMD5 = getMD5(feed.published + feed.link)
         self.saveStatus()
 
-        return True
-
+        if number == 0:
+            print "No Update"
+            return False
+        else:
+            print "Update " + str(number) + " items"
+            return True
 
 def main():
     reload(sys)
@@ -112,7 +121,7 @@ def main():
     lines = []
     o_file = open("rsslist.txt", "r")
     for line in o_file:
-        lines.append(line.strip('\n'))
+        lines.append(line)
     o_file.close()
 
     session = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
@@ -123,14 +132,14 @@ def main():
 
     o_file = open("rsslist.txt", "w")
 
+    num = 0
     for line in lines:
+        num = num + 1
+        outputStep = '(' + str(num) + '/' + str(len(lines)) + ')'
+        print outputStep,
         feedItem = FeedItem(line, session)
         ret = feedItem.update()
         o_file.write(feedItem.infoLine)
-        if(ret):
-            print("Update Finished")
-        else:
-            print("No Update")
 
     session.quit()
     o_file.close()
