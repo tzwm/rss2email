@@ -1,0 +1,11 @@
+[email config]
+server = smtp.gmail.com
+port = 587
+
+[sender]
+email = 
+password = 
+
+[recipient]
+email = 
+

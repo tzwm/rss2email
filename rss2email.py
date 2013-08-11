@@ -1,5 +1,6 @@
 import os, re
 import sys
+import ConfigParser
 import smtplib 
 import logging
 from hashlib import md5
@@ -10,13 +11,6 @@ from email.mime.text import MIMEText
 
 import base.feedparser as feedparser
 import base.log
-
-SMTP_SERVER = 'smtp.gmail.com'
-SMTP_PORT = 587
- 
-SENDER = "tzwm.rss@gmail.com" 
-PASSWORD = "" 
-RECIPIENT = 'tzwm.rss@gmail.com'
 
 def getMD5(s):
     m = md5()
@@ -33,9 +27,11 @@ class FeedItem():
 
     session = ""
 
-    def __init__(self, inputLine, _session, outputInfo):
+    def __init__(self, inputLine, _session, outputInfo, _sender, _recipient):
         self.session = _session
         self.infoLine = inputLine
+        self.sender = _sender
+        self.recipient = _recipient
 
         inputLine = inputLine.strip('\n')
         inputLine = inputLine.split(' ', 2)
@@ -68,12 +64,12 @@ class FeedItem():
 
     def sendItem(self, item, number):
         msg = MIMEMultipart()
-        msg['From'] = SENDER
-        msg['To'] = RECIPIENT
+        msg['From'] = self.sender 
+        msg['To'] = self.recipient 
         message = item.description + '<br /><br />' + item.link
         msg['Subject'] = item.title
         msg.attach(MIMEText(message.encode('utf8'), 'html'))
-        self.session.sendmail(SENDER, RECIPIENT, msg.as_string())
+        self.session.sendmail(self.sender, self.recipient, msg.as_string())
         logging.info('%s: %s', str(number), item.title)
 
     def saveStatus(self):
@@ -116,12 +112,35 @@ class FeedItem():
             logging.info("Updated %s items.", str(number))
             return True
 
-def main():
+def init():
     reload(sys)
     sys.setdefaultencoding('utf8')
     base.log.init()
     logging.info('rss2email is running...')
 
+def loginEmail():
+    cf = ConfigParser.ConfigParser()
+    cf.read("config.ini")
+    smtp_server = cf.get("email config", "server")
+    smtp_port = cf.get("email config", "port")
+    sender = cf.get("sender", "email")
+    password = cf.get("sender", "password")
+    recipient = cf.get("recipient", "email")
+
+    session = smtplib.SMTP(smtp_server, smtp_port)
+    session.ehlo()
+    session.starttls()
+    session.ehlo
+    try:
+        session.login(sender, password)
+    except Exception, data:
+        logging.error('Email Login Error.')
+        return
+    logging.info('Email Login Successful.')
+
+    return (session, sender, recipient)
+
+def getList():
     lines = []
     o_file = open("rsslist.txt", "r")
     for line in o_file:
@@ -129,31 +148,29 @@ def main():
             continue
         lines.append(line)
     o_file.close()
-    logging.info('rsslist got successful.')
+    logging.info('rsslist Got Successful.')
 
-    session = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-    session.ehlo()
-    session.starttls()
-    session.ehlo
-    try:
-        session.login(SENDER, PASSWORD)
-    except Exception, data:
-        logging.error('Email Login Error.')
-        return
-    logging.info('Email Login Successful.')
+    return lines
+
+def destory(session, o_file):
+    session.quit()
+    o_file.close()
+
+def main():
+    init()
+    session, sender, recipient = loginEmail()
+    rsslist = getList()
 
     o_file = open("rsslist.txt", "w")
-
     num = 0
-    for line in lines:
+    for line in rsslist:
         num = num + 1
-        outputStep = '(' + str(num) + '/' + str(len(lines)) + ')'
-        feedItem = FeedItem(line, session, outputStep)
+        outputStep = '(' + str(num) + '/' + str(len(rsslist)) + ')'
+        feedItem = FeedItem(line, session, outputStep, sender, recipient)
         ret = feedItem.update()
         o_file.write(feedItem.infoLine)
 
-    session.quit()
-    o_file.close()
+    destory(session, o_file)
 
 if __name__ == '__main__':
     main()
