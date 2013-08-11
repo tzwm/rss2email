@@ -3,6 +3,7 @@ import sys
 import ConfigParser
 import smtplib 
 import logging
+import shutil
 from hashlib import md5
 
 from email.mime.image import MIMEImage
@@ -116,6 +117,11 @@ def init():
     reload(sys)
     sys.setdefaultencoding('utf8')
     base.log.init()
+    if os.path.isfile('rsslist.txt.swp'):
+        logging.warning('Last run is failed, recovering...')
+        shutil.copy('rsslist.txt.swp', 'rsslist.txt')
+    else: 
+        shutil.copy('rsslist.txt', 'rsslist.txt.swp')
     logging.info('rss2email is running...')
 
 def loginEmail():
@@ -155,6 +161,7 @@ def getList():
 def destory(session, o_file):
     session.quit()
     o_file.close()
+    os.remove('rsslist.txt.swp')
 
 def main():
     init()
