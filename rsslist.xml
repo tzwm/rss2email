@@ -4,8 +4,8 @@
 		<title>subscriptions for rss2email</title>
 	</head>
 	<body>
-        <tag text='test'>
-            <item htmlUrl="http://blog.tzwm.me/" rssUrl="/home/tzwm/Development/project/rss2email/test.xml" text="test" type="rss"/>
+		<tag text="test">
+			<item htmlUrl="http://blog.tzwm.me/" lastMD5="e1205eea801c1f5e46338e0f6fff557e" lastModified="" rssUrl="/home/tzwm/Development/project/rss2email/test.xml" text="test" type="rss"/>
 		</tag>
 	</body>
 </root>

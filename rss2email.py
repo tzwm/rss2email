@@ -29,11 +29,15 @@ class FeedItem():
     lastMD5 = ""
     lastModified = ""
 
-    def __init__(self, item, _session, outputInfo, _sender, _recipient):
+    def __init__(self, item, _node, _session, outputInfo, _sender, _recipient):
         self.session = _session
         self.sender = _sender
         self.recipient = _recipient
-        self.node = item
+        self.node = _node
+        self.node.set('text', item.attrib['text'])
+        self.node.set('type', item.attrib['type'])
+        self.node.set('htmlUrl', item.attrib['htmlUrl'])
+        self.node.set('rssUrl', item.attrib['rssUrl'])
         self.title = item.attrib['text']
         self.rssUrl = item.attrib['rssUrl']
         if 'lastMD5' in item.attrib.keys():
@@ -153,29 +157,34 @@ def getList():
 
     return tree 
 
-def dfs_rss(num, root, tot, session, sender, recipient):
+def dfs_rss(num, root, output, tot, session, sender, recipient):
     for item in root:
+        if item.tag == 'body':
+            continue
         if 'type' in item.attrib.keys():
-            if item.tag != 'body':
-                recipient_ = recipient.split('@')[0] + '+' + item.tag + '@' + recipient.split('@')[1]
+            if root.tag != 'body':
+                recipient_ = recipient.split('@')[0] + '+' + root.attrib['text'] + '@' + recipient.split('@')[1]
             else:
                 recipient_ = recipient
             num = num + 1
             outputStep = '(' + str(num) + '/' + str(tot) + ')'
-            feedItem = FeedItem(item, session, outputStep, sender, recipient_)
+            node = ET.SubElement(output, 'item')
+            feedItem = FeedItem(item, node, session, outputStep, sender, recipient_)
             ret = feedItem.update()
         else:
-            dfs_rss(num, item, tot, session, sender, recipient)
+            node = ET.SubElement(output, 'tag')
+            node.set('text', item.attrib['text'])
+            dfs_rss(num, item, node, tot, session, sender, recipient)
             item.clear()
 
-def destory(session, rsslist):
+def destory(session, root_output):
     session.quit()
     
-    #xml_string = ET.tostring(rsslist.getroot())
-    #doc = minidom.parseString(xml_string)
-    #o_file = open('rsslist.xml', 'w')
-    #o_file.write(doc.toprettyxml())
-    #o_file.close()
+    xml_string = ET.tostring(root_output)
+    doc = minidom.parseString(xml_string)
+    o_file = open('rsslist.xml', 'w')
+    o_file.write(doc.toprettyxml())
+    o_file.close()
 
     os.remove('rsslist.xml.swp')
     
@@ -188,10 +197,15 @@ def main():
     tot = 0
     for i in rsslist.iter(tag='item'):
         tot = tot +1
+    root_output = ET.Element('root')
+    head_output = ET.SubElement(root_output, 'head')
+    title = ET.SubElement(head_output, 'title')
+    title.text = 'subscriptions for rss2email'
+    body_output = ET.SubElement(root_output, 'body')
 
-    dfs_rss(0, rsslist.iter(tag='body'), tot, session, sender, recipient)
+    dfs_rss(0, rsslist.find('body'), body_output, tot, session, sender, recipient)
 
-    destory(session, rsslist)
+    destory(session, root_output)
 
 if __name__ == '__main__':
     main()
