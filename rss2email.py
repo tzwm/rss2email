@@ -10,6 +10,12 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+try:
+    import xml.etree.cElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
+from xml.dom import minidom
+
 import base.feedparser as feedparser
 import base.log
 
@@ -20,34 +26,23 @@ def getMD5(s):
     return m.hexdigest()
 
 class FeedItem():
-    feedLink = ""
     lastMD5 = ""
     lastModified = ""
-    feedD = ""
-    infoLine = ""
 
-    session = ""
-
-    def __init__(self, inputLine, _session, outputInfo, _sender, _recipient):
+    def __init__(self, item, _session, outputInfo, _sender, _recipient):
         self.session = _session
-        self.infoLine = inputLine
         self.sender = _sender
         self.recipient = _recipient
+        self.node = item
+        self.title = item.attrib['text']
+        self.rssUrl = item.attrib['rssUrl']
+        if 'lastMD5' in item.attrib.keys():
+            self.lastMD5 = item.attrib['lastMD5']
+        if 'lastModified' in item.attrib.keys():
+            self.lastModified = item.attrib['lastModified']
+        self.feedD = feedparser.parse(self.rssUrl, modified=self.lastModified)
 
-        inputLine = inputLine.strip('\n')
-        inputLine = inputLine.split(' ', 2)
-        self.feedLink = inputLine[0]
-        if len(inputLine) == 1:
-            self.feedD = feedparser.parse(self.feedLink)
-        if len(inputLine) == 2:
-            self.lastMD5 = inputLine[1]
-            self.feedD = feedparser.parse(self.feedLink)
-        if len(inputLine) == 3:
-            self.lastMD5 = inputLine[1]
-            self.lastModified = inputLine[2]
-            self.feedD = feedparser.parse(self.feedLink, modified=self.lastModified)
-
-        logging.info(outputInfo + ' ' + self.feedD.feed.title + ':')
+        logging.info(outputInfo + ' ' + self.title + ':')
 
     def checkUpdate(self):
         #if self.feedD.status == 304:
@@ -78,7 +73,8 @@ class FeedItem():
             self.lastModified = self.feedD.modified
         else:
             self.lastModified = ""
-        self.infoLine = self.feedLink + ' ' + self.lastMD5 + ' ' + self.lastModified + '\n'
+        self.node.set('lastMD5', self.lastMD5)
+        self.node.set('lastModified', self.lastModified)
 
     def update(self):
         if not self.checkUpdate():
@@ -117,11 +113,16 @@ def init():
     reload(sys)
     sys.setdefaultencoding('utf8')
     base.log.init()
-    if os.path.isfile('rsslist.txt.swp'):
+
+    if not os.path.isfile('rsslist.xml'):
+        logging.error('no rsslist file')
+        sys.exit()
+
+    if os.path.isfile('rsslist.xml.swp'):
         logging.warning('Last run is failed, recovering...')
-        shutil.copy('rsslist.txt.swp', 'rsslist.txt')
+        shutil.copy('rsslist.xml.swp', 'rsslist.xml')
     else: 
-        shutil.copy('rsslist.txt', 'rsslist.txt.swp')
+        shutil.copy('rsslist.xml', 'rsslist.xml.swp')
     logging.info('rss2email is running...')
 
 def loginEmail():
@@ -147,37 +148,50 @@ def loginEmail():
     return (session, sender, recipient)
 
 def getList():
-    lines = []
-    o_file = open("rsslist.txt", "r")
-    for line in o_file:
-        if line.strip('\n') == '':
-            continue
-        lines.append(line)
-    o_file.close()
+    tree = ET.ElementTree(file='rsslist.xml')
     logging.info('rsslist Got Successful.')
 
-    return lines
+    return tree 
 
-def destory(session, o_file):
+def dfs_rss(num, root, tot, session, sender, recipient):
+    for item in root:
+        if 'type' in item.attrib.keys():
+            if item.tag != 'body':
+                recipient_ = recipient.split('@')[0] + '+' + item.tag + '@' + recipient.split('@')[1]
+            else:
+                recipient_ = recipient
+            num = num + 1
+            outputStep = '(' + str(num) + '/' + str(tot) + ')'
+            feedItem = FeedItem(item, session, outputStep, sender, recipient_)
+            ret = feedItem.update()
+        else:
+            dfs_rss(num, item, tot, session, sender, recipient)
+            item.clear()
+
+def destory(session, rsslist):
     session.quit()
-    o_file.close()
-    os.remove('rsslist.txt.swp')
+    
+    #xml_string = ET.tostring(rsslist.getroot())
+    #doc = minidom.parseString(xml_string)
+    #o_file = open('rsslist.xml', 'w')
+    #o_file.write(doc.toprettyxml())
+    #o_file.close()
+
+    os.remove('rsslist.xml.swp')
+    
 
 def main():
     init()
     session, sender, recipient = loginEmail()
     rsslist = getList()
 
-    o_file = open("rsslist.txt", "w")
-    num = 0
-    for line in rsslist:
-        num = num + 1
-        outputStep = '(' + str(num) + '/' + str(len(rsslist)) + ')'
-        feedItem = FeedItem(line, session, outputStep, sender, recipient)
-        ret = feedItem.update()
-        o_file.write(feedItem.infoLine)
+    tot = 0
+    for i in rsslist.iter(tag='item'):
+        tot = tot +1
 
-    destory(session, o_file)
+    dfs_rss(0, rsslist.iter(tag='body'), tot, session, sender, recipient)
+
+    destory(session, rsslist)
 
 if __name__ == '__main__':
     main()
