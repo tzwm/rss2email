@@ -43,7 +43,7 @@
 			<item htmlUrl="http://cn.nytimes.com/" rssUrl="http://cn.nytimes.com/rss/news.xml" text="纽约时报中文网" type="rss"/>
 			<item htmlUrl="http://cn.fmnnow.com" rssUrl="http://feeds.feedburner.com/fmnnow/cn?source=ignition" text="自曲新闻 FMN" type="rss"/>
 		</tag>
-		<tag text="河蟹">
+		<tag text="8964">
 			<item htmlUrl="http://www.google.com/reader/view/feed%2Fhttp%3A%2F%2Ffeeds2.feedburner.com%2Fchinagfwblog" rssUrl="http://feeds2.feedburner.com/chinagfwblog" text="GFW BLOG" type="rss"/>
 			<item htmlUrl="http://igfw.net" rssUrl="http://igfw.tk/feed" text="iGFW" type="rss"/>
 			<item htmlUrl="http://govecn-google.blogspot.com/" rssUrl="http://feeds.feedburner.com/GoveCN" text="政府丑闻" type="rss"/>

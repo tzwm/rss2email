@@ -48,13 +48,6 @@ class FeedItem():
 
         logging.info(outputInfo + ' ' + self.title + ':')
 
-    def checkUpdate(self):
-        if self.feedD.status == 304:
-            return False 
-        else:
-            return True
-        return self.feed 
-
     def checkItem(self, item):
         itemStr = item.published
         itemStr += item.link
@@ -82,7 +75,7 @@ class FeedItem():
 
     def update(self):
         if not hasattr(self.feedD, 'status'):
-            logging.error("Error.")
+            logging.error('Error.')
             return False
         if self.feedD.status == 304:
             logging.info("No Update.")
@@ -190,8 +183,10 @@ def dfs_rss(num, root, output, tot, session, sender, recipient):
         else:
             node = ET.SubElement(output, 'tag')
             node.set('text', item.attrib['text'])
-            dfs_rss(num, item, node, tot, session, sender, recipient)
+            num = dfs_rss(num, item, node, tot, session, sender, recipient)
             item.clear()
+
+    return num
 
 def destory(session, root_output):
     session.quit()
