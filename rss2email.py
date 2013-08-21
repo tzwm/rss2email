@@ -49,11 +49,11 @@ class FeedItem():
         logging.info(outputInfo + ' ' + self.title + ':')
 
     def checkUpdate(self):
-        #if self.feedD.status == 304:
-            #return False 
-        #else:
-            #return True
-        return True
+        if self.feedD.status == 304:
+            return False 
+        else:
+            return True
+        return self.feed 
 
     def checkItem(self, item):
         itemStr = item.published
@@ -81,26 +81,37 @@ class FeedItem():
         self.node.set('lastModified', self.lastModified)
 
     def update(self):
-        if not self.checkUpdate():
+        if not hasattr(self.feedD, 'status'):
+            logging.error("Error.")
+            return False
+        if self.feedD.status == 304:
+            logging.info("No Update.")
+            return False
+        if self.feedD.status == 301:
+            logging.error("The feed was permanently redirected to a new URL.")
+            return False
+        if self.feedD.status / 100 == 4:
+            logging.error("Error:" + str(self.feedD.status))
             return False
 
         number = 0
-        ret = 0;
         if self.lastMD5 == "":
-            ret = 1
+            hasLastMD5 = False
+        else:
+            hasLastMD5 = True
     
         for feed in reversed(self.feedD.entries):
-            if ret == 0:
+            if hasLastMD5:
                 if self.checkItem(feed):
-                    ret = 1
+                    hasLastMD5 = False
                 continue
             
-            if number > 3:
+            if number >= 1:
                 break
             number = number + 1
             self.sendItem(feed, number)
 
-        if ret == 0:
+        if hasLastMD5:
             for feed in reversed(self.feedD.entries):
                 self.sendItem(feed, number)
 
