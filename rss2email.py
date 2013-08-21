@@ -67,7 +67,7 @@ class FeedItem():
         msg['From'] = self.sender 
         msg['To'] = self.recipient 
         message = item.description + '<br /><br />' + item.link
-        msg['Subject'] = item.title
+        msg['Subject'] = '[' + self.title + '] ' + item.title
         msg.attach(MIMEText(message.encode('utf8'), 'html'))
         self.session.sendmail(self.sender, self.recipient, msg.as_string())
         logging.info('%s: %s', str(number), item.title)
@@ -95,6 +95,8 @@ class FeedItem():
                     ret = 1
                 continue
             
+            if number > 3:
+                break
             number = number + 1
             self.sendItem(feed, number)
 
@@ -163,7 +165,10 @@ def dfs_rss(num, root, output, tot, session, sender, recipient):
             continue
         if 'type' in item.attrib.keys():
             if root.tag != 'body':
-                recipient_ = recipient.split('@')[0] + '+' + root.attrib['text'] + '@' + recipient.split('@')[1]
+                recipient_ = (recipient.split('@')[0] + 
+                                #'+' + item.attrib['text'] + 
+                                '+' + root.attrib['text'] + 
+                                '@' + recipient.split('@')[1])
             else:
                 recipient_ = recipient
             num = num + 1
