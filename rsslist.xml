@@ -4,6 +4,8 @@
 		<title>subscriptions for rss2email</title>
 	</head>
 	<body>
+		<item htmlUrl="http://abduzeedo.com/" rssUrl="http://abduzeedo.com/frontpage/feed" text="Latest articles" type="rss"/>
+		<item htmlUrl="http://googlechinablog.blogspot.com/" rssUrl="http://googlechinablog.com/atom.xml" text="Google 黑板报 -- Google 中国的博客网志" type="rss"/>
 		<item htmlUrl="http://www.google.com/doodles" rssUrl="http://www.google.com/doodles/doodles.xml" text="Google Doodles" type="rss"/>
 		<item htmlUrl="http://oispace-fhs.blogspot.com/" rssUrl="http://oispace-fhs.blogspot.com/feeds/posts/default" text="OIspace" type="rss"/>
 		<item htmlUrl="http://stonekyx.blogspot.com/" rssUrl="http://stonekyx.blogspot.com/feeds/posts/default" text="Pointer User" type="rss"/>
@@ -60,7 +62,6 @@
 			<item htmlUrl="http://cn.engadget.com" rssUrl="http://cn.engadget.com/rss.xml" text="Engadget 中国版" type="rss"/>
 			<item htmlUrl="http://www.extremetech.com" rssUrl="http://www.extremetech.com/feed" text="Extremetech" type="rss"/>
 			<item htmlUrl="http://gamerboom.com" rssUrl="http://gamerboom.com/feed" text="GamerBoom.com 游戏邦" type="rss"/>
-			<item htmlUrl="http://googlechinablog.blogspot.com/" rssUrl="http://googlechinablog.com/atom.xml" text="Google 黑板报 -- Google 中国的博客网志" type="rss"/>
 			<item htmlUrl="http://ap.ign.com" rssUrl="http://ap.ign.com/zh/pc/rss" text="IGN SE Edition - PC" type="rss"/>
 			<item htmlUrl="http://www.internet2share.com" rssUrl="http://feed.feedsky.com/Internet2Share" text="Internet2Share" type="rss"/>
 			<item htmlUrl="http://www.ipc.me" rssUrl="http://feed.ipc.me/" text="iPc.me" type="rss"/>
@@ -113,7 +114,6 @@
 			<item htmlUrl="http://www.google.com/reader/view/feed%2Fhttp%3A%2F%2Fwww.mymodernmet.com%2Fprofiles%2Fblog%2Ffeed%3Fxn_auth%3Dno" rssUrl="http://www.mymodernmet.com/profiles/blog/feed?xn_auth=no" text="Everyone's Blog Posts - My Modern Metropolis" type="rss"/>
 			<item htmlUrl="http://www.fisherv.com" rssUrl="http://feed.fisherv.com/" text="Icecream冰淇淋" type="rss"/>
 			<item htmlUrl="http://www.lantaw.com/" rssUrl="http://lantaw.blogspot.com/feeds/posts/default" text="Lantaw - Philippines Outdoor and Travel Photos" type="rss"/>
-			<item htmlUrl="http://abduzeedo.com/" rssUrl="http://abduzeedo.com/frontpage/feed" text="Latest articles" type="rss"/>
 			<item htmlUrl="http://www.leica.org.cn/index.php" rssUrl="http://feed.feedsky.com/leica" text="Leica中文摄影杂志" type="rss"/>
 			<item htmlUrl="http://www.mobileinc.co.uk" rssUrl="http://feeds.feedburner.com/MobileInc" text="Mobile Inc" type="rss"/>
 			<item htmlUrl="http://noteandpoint.com" rssUrl="http://feeds.feedburner.com/NoteAndPoint?source=ignition" text="Note &amp; Point" type="rss"/>

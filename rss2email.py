@@ -48,6 +48,28 @@ class FeedItem():
 
         logging.info(outputInfo + ' ' + self.title + ':')
 
+    def checkFeedStatus(self, feedD):
+        if not hasattr(feedD, 'status'):
+            logging.error('Error.')
+            return False
+        if feedD.status == 304:
+            logging.info("No Update.")
+            return False
+        if feedD.status == 301:
+            logging.error("The feed was permanently redirected to a new URL.")
+            return False
+        if feedD.status / 100 == 4:
+            logging.error("Error:" + str(self.feedD.status))
+            return False
+        if feedD.status != 200:
+            logging.error("Error:" + str(self.feedD.status))
+            return False
+        if len(feedD.entries) == 0:
+            logging.error('Error: No RSS Items')
+            return False
+
+        return True
+
     def checkItem(self, item):
         if hasattr(item, 'published'):
             itemStr = item.published
@@ -77,17 +99,7 @@ class FeedItem():
         self.node.set('lastModified', self.lastModified)
 
     def update(self):
-        if not hasattr(self.feedD, 'status'):
-            logging.error('Error.')
-            return False
-        if self.feedD.status == 304:
-            logging.info("No Update.")
-            return False
-        if self.feedD.status == 301:
-            logging.error("The feed was permanently redirected to a new URL.")
-            return False
-        if self.feedD.status / 100 == 4:
-            logging.error("Error:" + str(self.feedD.status))
+        if not self.checkFeedStatus(self.feedD):
             return False
 
         number = 0
