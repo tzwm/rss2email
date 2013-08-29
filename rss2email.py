@@ -49,7 +49,10 @@ class FeedItem():
         logging.info(outputInfo + ' ' + self.title + ':')
 
     def checkItem(self, item):
-        itemStr = item.published
+        if hasattr(item, 'published'):
+            itemStr = item.published
+        else:
+            itemStr = ''
         itemStr += item.link
         md5Str = getMD5(itemStr)
     
@@ -109,7 +112,10 @@ class FeedItem():
                 self.sendItem(feed, number)
 
         feed = self.feedD.entries[0]
-        self.lastMD5 = getMD5(feed.published + feed.link)
+        if hasattr(feed, 'published'):
+            self.lastMD5 = getMD5(feed.published + feed.link)
+        else:
+            self.lastMD5 = getMD5(feed.link)
         self.saveStatus()
 
         if number == 0:

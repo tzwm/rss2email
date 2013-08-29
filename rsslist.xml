@@ -4,6 +4,7 @@
 		<title>subscriptions for rss2email</title>
 	</head>
 	<body>
+		<item htmlUrl="http://www.google.com/doodles" rssUrl="http://www.google.com/doodles/doodles.xml" text="Google Doodles" type="rss"/>
 		<item htmlUrl="http://oispace-fhs.blogspot.com/" rssUrl="http://oispace-fhs.blogspot.com/feeds/posts/default" text="OIspace" type="rss"/>
 		<item htmlUrl="http://stonekyx.blogspot.com/" rssUrl="http://stonekyx.blogspot.com/feeds/posts/default" text="Pointer User" type="rss"/>
 		<item htmlUrl="http://tzwm.blogspot.com/" rssUrl="http://tzwm.blogspot.com/feeds/posts/default" text="tzwm" type="rss"/>
@@ -59,7 +60,6 @@
 			<item htmlUrl="http://cn.engadget.com" rssUrl="http://cn.engadget.com/rss.xml" text="Engadget 中国版" type="rss"/>
 			<item htmlUrl="http://www.extremetech.com" rssUrl="http://www.extremetech.com/feed" text="Extremetech" type="rss"/>
 			<item htmlUrl="http://gamerboom.com" rssUrl="http://gamerboom.com/feed" text="GamerBoom.com 游戏邦" type="rss"/>
-			<item htmlUrl="http://www.google.com/doodles" rssUrl="http://www.google.com/doodles/doodles.xml" text="Google Doodles" type="rss"/>
 			<item htmlUrl="http://googlechinablog.blogspot.com/" rssUrl="http://googlechinablog.com/atom.xml" text="Google 黑板报 -- Google 中国的博客网志" type="rss"/>
 			<item htmlUrl="http://ap.ign.com" rssUrl="http://ap.ign.com/zh/pc/rss" text="IGN SE Edition - PC" type="rss"/>
 			<item htmlUrl="http://www.internet2share.com" rssUrl="http://feed.feedsky.com/Internet2Share" text="Internet2Share" type="rss"/>
