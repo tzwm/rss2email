@@ -71,11 +71,10 @@ class FeedItem():
         return True
 
     def checkItem(self, item):
-        if hasattr(item, 'published'):
-            itemStr = item.published
-        else:
-            itemStr = ''
-        itemStr += item.link
+        itemStr = ''
+        itemStr = itemStr + item.title
+        if hasattr(item, 'link'):
+            itemStr = itemStr + item.link
         md5Str = getMD5(itemStr)
     
         return md5Str == self.lastMD5
@@ -121,13 +120,16 @@ class FeedItem():
 
         if hasLastMD5:
             for feed in reversed(self.feedD.entries):
+                if number >= 1:
+                    break
+                number = number + 1
                 self.sendItem(feed, number)
 
         feed = self.feedD.entries[0]
-        if hasattr(feed, 'published'):
-            self.lastMD5 = getMD5(feed.published + feed.link)
+        if hasattr(feed, 'link'):
+            self.lastMD5 = getMD5(feed.title + feed.link)
         else:
-            self.lastMD5 = getMD5(feed.link)
+            self.lastMD5 = getMD5(feed.title)
         self.saveStatus()
 
         if number == 0:
@@ -199,6 +201,10 @@ def dfs_rss(num, root, output, tot, session, sender, recipient):
             feedItem = FeedItem(item, node, session, outputStep, sender, recipient_)
             ret = feedItem.update()
         else:
+            if len(item.attrib['text']) != len(item.attrib['text'].encode('utf-8')):
+                logging.error('The tag name can''t be Chinese')
+                item.clear()
+                continue
             node = ET.SubElement(output, 'tag')
             node.set('text', item.attrib['text'])
             num = dfs_rss(num, item, node, tot, session, sender, recipient)
