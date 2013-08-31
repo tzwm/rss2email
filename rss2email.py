@@ -113,14 +113,14 @@ class FeedItem():
                     hasLastMD5 = False
                 continue
             
-            if number >= 1:
+            if number >= 10:
                 break
             number = number + 1
             self.sendItem(feed, number)
 
         if hasLastMD5:
             for feed in reversed(self.feedD.entries):
-                if number >= 1:
+                if number >= 10:
                     break
                 number = number + 1
                 self.sendItem(feed, number)
