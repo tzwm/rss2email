@@ -21,17 +21,22 @@ function main() {
         tagTmp = tagTmp.substring(tagTmp.search(/\//)+1);
       }
     }
+    else {
+      tag = "";
+    }
     
     var subject = messages[0].getSubject();
     subject = subject.substring(subject.search(/\[/)+1, subject.search(/\]/));
     tag = tag + "/" + subject;
     if (!GmailApp.getUserLabelByName(tag)) {
+      Utilities.sleep(500);
       GmailApp.createLabel(tag);
     }
     
     var label = GmailApp.getUserLabelByName(tag);
     threads[i].addLabel(label);
-    
+
+    Utilities.sleep(500);
 //    break;
   }
 };
