@@ -83,7 +83,11 @@ class FeedItem():
         message = item.description + '<br /><br />' + item.link
         msg['Subject'] = '[' + self.title + '] ' + item.title
         msg.attach(MIMEText(message.encode('utf8'), 'html'))
-        self.session.sendmail(self.sender, self.recipient, msg.as_string())
+        try:
+            self.session.sendmail(self.sender, self.recipient, msg.as_string())
+        except Exception, data:
+            logging.error('The Email session is invalid, please run again.')
+            quit()
         logging.info('%s: %s', str(number), item.title)
 
     def saveXML(self):
@@ -196,7 +200,7 @@ def loginEmail():
         session.login(sender, password)
     except Exception, data:
         logging.error('Email Login Error.')
-        return
+        quit() 
     logging.info('Email Login Successful.')
 
     return (session, sender, recipient)
