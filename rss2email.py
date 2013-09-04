@@ -130,12 +130,12 @@ class FeedItem():
                     break
                 number = number + 1
                 self.sendItem(feed, number)
-            if hasattr(feed, 'link'):
-                self.lastMD5 = getMD5(feed.title + feed.link)
-            else:
-                self.lastMD5 = getMD5(feed.title)
-            self.node.set('lastMD5', self.lastMD5)
-            self.saveXML()
+                if hasattr(feed, 'link'):
+                    self.lastMD5 = getMD5(feed.title + feed.link)
+                else:
+                    self.lastMD5 = getMD5(feed.title)
+                self.node.set('lastMD5', self.lastMD5)
+                self.saveXML()
 
         if hasattr(self.feedD, 'modified'):
             self.lastModified = self.feedD.modified
@@ -165,10 +165,8 @@ def dfs_rss(num, root, tot, session, sender, recipient, rsslist):
         else:
             if len(item.attrib['text']) != len(item.attrib['text'].encode('utf-8')):
                 logging.error('The tag name can''t be Chinese')
-                item.clear()
-                continue
+                quit() 
             num = dfs_rss(num, item, tot, session, sender, recipient, rsslist)
-            item.clear()
 
     return num
 
@@ -211,14 +209,8 @@ def getList():
 
     return tree 
 
-def destory(session, root_output):
+def destory(session):
     session.quit()
-    
-    xml_string = ET.tostring(root_output)
-    doc = minidom.parseString(xml_string)
-    o_file = open('rsslist.xml', 'w')
-    o_file.write(doc.toprettyxml())
-    o_file.close()
 
 def main():
     init()
@@ -231,7 +223,7 @@ def main():
 
     dfs_rss(0, rsslist.find('body'), tot, session, sender, recipient, rsslist)
 
-    destory(session, root_output)
+    destory(session)
 
 if __name__ == '__main__':
     main()
